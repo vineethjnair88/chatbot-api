@@ -25,13 +25,22 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Define Schema
+// quote Schema
 const DataSchema = new mongoose.Schema({
   data: String,
  
 });
 
+// userinfo Schema
+const UserSchema = new mongoose.Schema({
+  data: String, 
+});
+
+
+
 const DataModel = mongoose.model("Data", DataSchema);
+const UserModel = mongoose.model("User", UserSchema);
+
 
 // Multer Middleware for handling form-data
 const upload = multer();
@@ -39,15 +48,26 @@ const upload = multer();
 // API Route - POST Data (Supports JSON & Form-Data)
 app.post("/submit", upload.none(), async (req, res) => {
   try {
-    console.log("Received Data:", req.body); // Debugging log
 
     const newData = new DataModel(req.body);
     await newData.save();
 
-    console.log("✅ Saved Data:", newData);
-    res.status(201).json({ message: "Data saved successfully!" });
+    res.status(201).send("Data saved successfully!");
   } catch (error) {
     console.error("❌ Error saving data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// API Route - POST User Data
+app.post("/user", upload.none(), async (req, res) => {
+  try {
+    const newUser = new UserModel(req.body);
+    await newUser.save();
+
+    res.status(201).send("User data saved successfully!");
+  } catch (error) {
+    console.error("❌ Error saving user data:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
